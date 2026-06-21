@@ -1,13 +1,12 @@
 /**
  * サイト共通フッター
  *
- * 免責・広告（景表法ステマ規制対応の明示）・最終更新・運営者情報を表示する。
+ * 免責・広告（景表法ステマ規制対応の明示）・最終更新・運営者情報と、
+ * コンプラ補助ページ（about / privacy / disclosure）への内部リンクを表示する。
  * layout.tsx から全ページ共通で呼び出される。
- *
- * 注：about / privacy / disclosure の各コンプラページは現フェーズではスコープ外のため、
- *     リンク切れを避けて内部リンクは設置していない（GA4本番有効化時に S001 を流用して追加予定）。
  */
 
+import Link from 'next/link';
 import { SITE_META, OPERATOR_INFO } from '@/lib/site-meta';
 
 export default function SiteFooter() {
@@ -32,6 +31,12 @@ export default function SiteFooter() {
           <strong className="text-gray-700"> 適用法令：</strong>
           {SITE_META.appliedLawDate}現在
         </p>
+        <div className="pt-3 border-t border-gray-200 flex flex-wrap gap-4">
+          <Link href="/" className="hover:text-gray-700">トップ</Link>
+          <Link href="/about" className="hover:text-gray-700">サイトについて</Link>
+          <Link href="/privacy" className="hover:text-gray-700">プライバシーポリシー</Link>
+          <Link href="/disclosure" className="hover:text-gray-700">運営者情報</Link>
+        </div>
       </div>
     </footer>
   );
