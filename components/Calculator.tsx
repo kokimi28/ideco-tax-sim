@@ -556,6 +556,7 @@ export default function Calculator() {
             iDeCoと退職金をいつ・どの順番で受け取るかで手取りは大きく変わります。あなたの状況に合わせた受取設計を、お金の専門家（FP）に無料で相談できます。
           </p>
           {/* TODO: ASP承認後にアフィリリンクを差し込み */}
+          {/* ⚠ 実URLへの差し替え＝収益化トリガー。Vercel Pro 移行のオーナー判断（STOP: 決済・課金）とセットで行う。CLAUDE.md「収益化トリガー」節を参照 */}
           <a
             href="#"
             rel="sponsored nofollow noopener noreferrer"
@@ -592,6 +593,7 @@ export default function Calculator() {
               重複調整・同年合算・短期勤続などが絡むケースは、専門家に任せるのが確実です。
             </p>
             {/* TODO: ASP承認後にアフィリリンクを差し込み */}
+            {/* ⚠ 実URLへの差し替え＝収益化トリガー。Vercel Pro 移行のオーナー判断（STOP: 決済・課金）とセットで行う。CLAUDE.md「収益化トリガー」節を参照 */}
             <a
               href="#"
               rel="sponsored nofollow noopener noreferrer"
