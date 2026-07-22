@@ -402,3 +402,24 @@ describe('compareVariants（隣接2比較）', () => {
     expect(cmp.reversedOrder.receipts[1].label).toBe('退職金');
   });
 });
+
+
+describe('記事 worked example: iDeCo一時金の受取税 基本（柱記事 ideco-lump-sum-tax の裏取り）', () => {
+  it('加入20年・控除800万円（最低保証込み）', () => {
+    expect(calcRetirementDeduction(20)).toBe(8_000_000);
+  });
+  it('iDeCo一時金500万円・加入20年は控除内で非課税（課税0・税0）', () => {
+    const ded = calcRetirementDeduction(20);
+    const taxable = calcTaxableIncome(5_000_000, ded);
+    expect(taxable).toBe(0);
+    expect(calcIncomeTax(taxable)).toBe(0);
+    expect(calcResidentTax(taxable)).toBe(0);
+  });
+  it('iDeCo一時金1,500万円・加入20年: 課税350万・所得税278,222・住民税350,000', () => {
+    const ded = calcRetirementDeduction(20);
+    const taxable = calcTaxableIncome(15_000_000, ded);
+    expect(taxable).toBe(3_500_000);
+    expect(calcIncomeTax(taxable)).toBe(278_222);
+    expect(calcResidentTax(taxable)).toBe(350_000);
+  });
+});
