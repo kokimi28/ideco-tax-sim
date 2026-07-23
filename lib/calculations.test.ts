@@ -423,3 +423,43 @@ describe('記事 worked example: iDeCo一時金の受取税 基本（柱記事 i
     expect(calcResidentTax(taxable)).toBe(350_000);
   });
 });
+
+
+describe('記事 worked example: 受取順序・間隔で変わる（receipt-order-comparison 記事の裏取り）', () => {
+  // 退職金2,000万/勤続30年・iDeCo1,000万/加入15年・重複15年・後の受給2026年
+  const base: IdecoSimInput = {
+    taishokukin: { amount: 20_000_000, years: 30 },
+    ideco: { amount: 10_000_000, years: 15 },
+    order: 'ideco_first', gapYears: 3, overlapYears: 15, laterReceiptYear: 2026,
+  };
+  it('同年合算: 税1,861,869 / 手取り28,138,131', () => {
+    const r = calcIdecoSim({ ...base, order: 'same_year', gapYears: 0 });
+    expect(r.appliedRule).toBe('同年合算');
+    expect(r.totalTax).toBe(1_861_869);
+    expect(r.totalNet).toBe(28_138_131);
+  });
+  it('iDeCo先→3年後に退職金（10年ルール適用）: 税1,541,274 / 手取り28,458,726', () => {
+    const r = calcIdecoSim(base);
+    expect(r.appliedRule).toBe('10年ルール');
+    expect(r.totalTax).toBe(1_541_274);
+    expect(r.totalNet).toBe(28_458_726);
+  });
+  it('iDeCo先→10年空ける（調整なし）: 税710,354 / 手取り29,289,646', () => {
+    const r = calcIdecoSim({ ...base, gapYears: 10 });
+    expect(r.appliedRule).toBe('調整なし');
+    expect(r.totalTax).toBe(710_354);
+    expect(r.totalNet).toBe(29_289_646);
+  });
+});
+
+
+describe('記事 worked example: iDeCo一時金vs年金（ideco-lump-sum-vs-pension 記事の一時金側の裏取り）', () => {
+  it('iDeCo一時金800万・加入15年: 控除600万・課税100万・所得税51,050・住民税100,000', () => {
+    const ded = calcRetirementDeduction(15);
+    expect(ded).toBe(6_000_000);
+    const taxable = calcTaxableIncome(8_000_000, ded);
+    expect(taxable).toBe(1_000_000);
+    expect(calcIncomeTax(taxable)).toBe(51_050);
+    expect(calcResidentTax(taxable)).toBe(100_000);
+  });
+});
