@@ -463,3 +463,57 @@ describe('記事 worked example: iDeCo一時金vs年金（ideco-lump-sum-vs-pens
     expect(calcResidentTax(taxable)).toBe(100_000);
   });
 });
+
+
+describe('記事 worked example: 重複調整の仕組み・使い残しとみなし年数（overlap-deduction-explained の裏取り）', () => {
+  // iDeCo先400万/加入15年（控除600万を使い残し）→ 3年後に退職金2,000万/勤続30年・重複15年入力・2026年
+  const base: IdecoSimInput = {
+    taishokukin: { amount: 20_000_000, years: 30 },
+    ideco: { amount: 4_000_000, years: 15 },
+    order: 'ideco_first', gapYears: 3, overlapYears: 15, laterReceiptYear: 2026,
+  };
+  it('みなし勤続年数: 使い残し400万 → floor(400万/40万)=10年', () => {
+    expect(calcDeemedYearsFromAmount(4_000_000)).toBe(10);
+    expect(calcRetirementDeduction(15)).toBe(6_000_000); // iDeCo単独控除600万＞400万＝使い残し
+  });
+  it('使用重複年数はみなし10年で上限（入力15年→10年）', () => {
+    expect(calcUsedOverlapYears(4_000_000, 15, 30, 15)).toBe(10);
+  });
+  it('後の退職金の控除減額: base(30)1,500万 − base(10)400万 = 1,100万', () => {
+    const od = calcOverlapDeduction(30, 10);
+    expect(od.deduction).toBe(11_000_000);
+    expect(od.reduction).toBe(4_000_000);
+  });
+  it('総額: 10年ルールで税932,422 / 手取り23,067,578', () => {
+    const r = calcIdecoSim(base);
+    expect(r.appliedRule).toBe('10年ルール');
+    expect(r.totalTax).toBe(932_422);
+    expect(r.totalNet).toBe(23_067_578);
+  });
+  it('対比: 11年空けて重複調整回避 → 税405,702 / 手取り23,594,298', () => {
+    const r = calcIdecoSim({ ...base, gapYears: 11 });
+    expect(r.appliedRule).toBe('調整なし');
+    expect(r.totalTax).toBe(405_702);
+    expect(r.totalNet).toBe(23_594_298);
+  });
+});
+
+
+describe('記事 worked example: 加入年数と退職所得控除（ideco-receiving-age 記事の裏取り）', () => {
+  it('一時金1,000万・加入25年: 控除1,150万＞1,000万 → 課税0・税0', () => {
+    const ded = calcRetirementDeduction(25);
+    expect(ded).toBe(11_500_000);
+    const taxable = calcTaxableIncome(10_000_000, ded);
+    expect(taxable).toBe(0);
+    expect(calcIncomeTax(taxable)).toBe(0);
+    expect(calcResidentTax(taxable)).toBe(0);
+  });
+  it('一時金1,000万・加入15年: 控除600万 → 課税200万・所得税104,652・住民税200,000', () => {
+    const ded = calcRetirementDeduction(15);
+    expect(ded).toBe(6_000_000);
+    const taxable = calcTaxableIncome(10_000_000, ded);
+    expect(taxable).toBe(2_000_000);
+    expect(calcIncomeTax(taxable)).toBe(104_652);
+    expect(calcResidentTax(taxable)).toBe(200_000);
+  });
+});
