@@ -7,6 +7,7 @@
       "Bash(npm run test)",
       "Bash(npm run build)",
       "Bash(npm run dev)",
+      "Bash(npm run dev *)",
       "Bash(node scripts/verify-ui-remote.mjs *)",
       "Bash(git status)",
       "Bash(git status *)",
@@ -30,6 +31,8 @@
       "Write(./.env.local)",
       "Bash(git push --force*)",
       "Bash(git push -f*)",
+      "Bash(git push * --force*)",
+      "Bash(git push * -f*)",
       "Bash(git push * main)"
     ],
     "ask": ["Bash(git push*)"]
